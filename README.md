@@ -147,25 +147,28 @@ El script hace las peticiones con `fetch`, consulta las tablas con el mismo pool
 
 | Caso | Petición | Esperado | Obtenido |
 |---|---|---|---|
-| Alta | `POST /api/equipos` TEST-01 | 201 + Location | |
-| Modificación | `PUT /api/equipos/:id` | 200 | |
-| Modificación inexistente | `PUT /api/equipos/999999` | 404 | |
-| Código repetido | `POST /api/equipos` TEST-01 otra vez | 409 | |
-| Validación | `POST` con nombre vacío / JSON mal formado | 400 / 400 | |
-| Búsqueda ILIKE | `GET /equipos?q=PORT` | 200, los 4 portátiles | |
-| Categoría + disponibilidad + orden | `GET /equipos?categoria=tableta&disponible=si&orden=nombre` | 200, 3 tabletas por nombre | |
-| Segunda página | `GET /equipos?pagina=2` | 200, equipos 6–10 por código | |
-| Filtro no válido | `GET /equipos?pagina=0` | 400 | |
-| Detalle | `GET /equipos/abc` / `GET /equipos/999999` | 400 / 404 | |
-| Borrado sin historial | `DELETE /api/equipos/:id` (TEST-01) | 204 | |
-| Borrado inexistente | `DELETE /api/equipos/999999` | 404 | |
-| Borrado con préstamos | `DELETE /api/equipos/2` (POR-002) | 409 | |
-| Préstamo correcto | `POST /api/prestamos` POR-001, usuario 1 | 201; 1 activo; disponible=false | |
-| Préstamo duplicado | Mismo equipo otra vez | 409; sigue habiendo 1 fila | |
-| Rollback | POR-003 con usuario 999 | 400; disponible=true; 0 préstamos | |
-| Devolución | `POST /api/prestamos/:id/devolucion` | 200; fecha registrada; disponible=true | |
-| Segunda devolución | Mismo préstamo | 409; fecha sin cambios | |
-| Simultaneidad | Dos préstamos de POR-004 con `Promise.all` | Un 201 y un 409; 1 préstamo activo | |
+| Alta | `POST /api/equipos` TEST-01 | 201 + Location | 201, Location `/api/equipos/13` ✔ |
+| Modificación | `PUT /api/equipos/13` | 200 | 200 ✔ |
+| Modificación inexistente | `PUT /api/equipos/999999` | 404 | 404 ✔ |
+| Código repetido | `POST /api/equipos` TEST-01 otra vez | 409 | 409 ✔ |
+| Validación | `POST` con nombre vacío / JSON mal formado | 400 / 400 | 400 / 400 ✔ |
+| Búsqueda ILIKE | `GET /equipos?q=PORT` | 200 | 200 ✔ |
+| Categoría + disponibilidad + orden | `GET /equipos?categoria=tableta&disponible=si&orden=nombre` | 200 | 200 ✔ |
+| Segunda página | `GET /equipos?pagina=2` | 200 | 200 ✔ |
+| Filtro no válido | `GET /equipos?pagina=0` / orden no permitido | 400 / 400 | 400 / 400 ✔ |
+| Detalle | `GET /equipos/abc` / `GET /equipos/999999` | 400 / 404 | 400 / 404 ✔ |
+| Borrado sin historial | `DELETE /api/equipos/13` | 204 | 204 ✔ |
+| Borrado inexistente | `DELETE /api/equipos/999999` | 404 | 404 ✔ |
+| Borrado con préstamos | `DELETE /api/equipos/2` (POR-002) | 409 | 409 ✔ |
+| Préstamo correcto | `POST /api/prestamos` POR-001, usuario 1 | 201; disponible=false; 1 activo | 201; false/1 ✔ |
+| Préstamo duplicado | Mismo equipo otra vez | 409; sigue habiendo 1 fila | 409; 1 fila ✔ |
+| Rollback | POR-003 con usuario 999 | 400; disponible=true; 0 préstamos | 400; true/0 ✔ |
+| Devolución | `POST /api/prestamos/3/devolucion` | 200; fecha registrada; disponible=true | 200; true/true ✔ |
+| Segunda devolución | Mismo préstamo | 409; fecha sin cambios | 409; fecha sin cambios ✔ |
+| Devolución inexistente | `POST /api/prestamos/999999/devolucion` | 409 | 409 ✔ |
+| Simultaneidad | Dos préstamos de POR-004 con `Promise.all` | Un 201 y un 409; 1 préstamo activo | 201 y 409; 1 activo ✔ |
+
+Resultado de `npm run pruebas` (ejecutado en GitHub Codespaces con PostgreSQL 18 en Docker): **30 de 30 comprobaciones OK**.
 
 ## Limitaciones conocidas
 
