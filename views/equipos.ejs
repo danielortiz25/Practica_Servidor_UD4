@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Equipos</title>
+</head>
+<body>
+<main>
+  <h1>Inventario de equipos</h1>
+
+  <form action="/equipos" method="get">
+    <label>Nombre
+      <input name="q" value="<%= q %>" maxlength="80">
+    </label>
+    <label>Categoría
+      <select name="categoria">
+        <option value="">Todas</option>
+        <% for (const c of categorias) { %>
+          <option value="<%= c %>" <%= categoria === c ? 'selected' : '' %>><%= c %></option>
+        <% } %>
+      </select>
+    </label>
+    <label>Estado
+      <select name="disponible">
+        <option value="" <%= disponible === '' ? 'selected' : '' %>>Todos</option>
+        <option value="si" <%= disponible === 'si' ? 'selected' : '' %>>Disponible</option>
+        <option value="no" <%= disponible === 'no' ? 'selected' : '' %>>Prestado</option>
+      </select>
+    </label>
+    <label>Orden
+      <select name="orden">
+        <option value="codigo" <%= orden === 'codigo' ? 'selected' : '' %>>Código</option>
+        <option value="nombre" <%= orden === 'nombre' ? 'selected' : '' %>>Nombre</option>
+      </select>
+    </label>
+    <button>Buscar</button>
+  </form>
+
+  <% if (equipos.length === 0) { %>
+    <p>No hay equipos que coincidan con los filtros en esta página.</p>
+  <% } else { %>
+    <table>
+      <thead>
+        <tr><th>Código</th><th>Nombre</th><th>Categoría</th><th>Estado</th></tr>
+      </thead>
+      <tbody>
+        <% for (const e of equipos) { %>
+          <tr>
+            <td><%= e.codigo %></td>
+            <td><a href="/equipos/<%= e.id %>"><%= e.nombre %></a></td>
+            <td><%= e.categoria %></td>
+            <td><%= e.estado %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <nav>
+    <p>Página <%= pagina %></p>
+    <% if (anterior) { %><a href="<%= anterior %>">Anterior</a><% } %>
+    <% if (siguiente) { %><a href="<%= siguiente %>">Siguiente</a><% } %>
+  </nav>
+</main>
+</body>
+</html>
